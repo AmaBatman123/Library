@@ -37,3 +37,19 @@ class Library:
                 print(book)
         else:
             print(f"Книга с названием '{title}' не найдена.")
+
+    def find_by_author(self, author):
+        found_books = [book for book in self.books if book.author.lower() == author.lower()]
+        if found_books:
+            for book in found_books:
+                print(book)
+        else:
+            print(f"Книги автора '{author}' не найдены.")
+
+    def mark_book_as_read(self, title):
+        for book in self.books:
+            if book.title.lower() == title.lower():
+                book.mark_as_read()
+                print(f"Книга '{book.title}' отмечена как прочитанная.")
+                return
+        print(f"Книга с названием '{title}' не найдена.")
