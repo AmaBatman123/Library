@@ -82,3 +82,74 @@ class Library:
     def sort_books_by_year(self):
         self.books.sort(key=lambda book: book.year)
         print("Книги отсортированы по году публикации.")
+
+
+def main():
+    library = Library()
+
+    while True:
+        print("\nМеню библиотеки:")
+        print("1. Добавить книгу")
+        print("2. Просмотреть все книги")
+        print("3. Найти книгу по названию")
+        print("4. Найти книги по автору")
+        print("5. Отметить книгу как прочитанную")
+        print("6. Отметить книгу как непрочитанную")
+        print("7. Удалить книгу")
+        print("8. Показать прочитанные книги")
+        print("9. Показать непрочитанные книги")
+        print("10. Сортировать книги по году публикации")
+        print("0. Выйти")
+
+        choice = input("Выберите действие: ")
+
+        if choice == "1":
+            title = input("Введите название книги: ")
+            author = input("Введите автора книги: ")
+            year = int(input("Введите год публикации: "))
+            book = Book(title, author, year)
+            library.add_book(book)
+
+        elif choice == "2":
+            print("\nСписок книг:")
+            library.list_books()
+
+        elif choice == "3":
+            title = input("Введите название книги: ")
+            library.find_by_title(title)
+
+        elif choice == "4":
+            author = input("Введите автора книги: ")
+            library.find_by_author(author)
+
+        elif choice == "5":
+            title = input("Введите название книги: ")
+            library.mark_book_as_read(title)
+
+        elif choice == "6":
+            title = input("Введите название книги: ")
+            library.mark_book_as_unread(title)
+
+        elif choice == "7":
+            title = input("Введите название книги для удаления: ")
+            library.remove_book(title)
+
+        elif choice == "8":
+            print("\nПрочитанные книги:")
+            library.filter_books(read_status=True)
+
+        elif choice == "9":
+            print("\nНепрочитанные книги:")
+            library.filter_books(read_status=False)
+
+        elif choice == "10":
+            library.sort_books_by_year()
+            print("\nСписок книг после сортировки:")
+            library.list_books()
+
+        elif choice == "0":
+            print("Выход из программы.")
+            break
+
+        else:
+            print("Неверный ввод, попробуйте снова.")
