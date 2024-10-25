@@ -1,3 +1,8 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+
+app = Flask(__name__)
+app.secret_key = 'Lib'
+
 class Book:
     def __init__(self, title, author, year):
         self.title = title
@@ -29,6 +34,7 @@ class Library:
         else:
             for book in self.books:
                 print(book)
+        return self.books if self.books else []
 
     def find_by_title(self, title):
         found_books = [book for book in self.books if book.title.lower() == title.lower()]
@@ -84,75 +90,59 @@ class Library:
         print("Книги отсортированы по году публикации.")
 
 
-def main():
-    library = Library()
+library = Library()
 
-    while True:
-        print("\nМеню библиотеки:")
-        print("1. Добавить книгу")
-        print("2. Просмотреть все книги")
-        print("3. Найти книгу по названию")
-        print("4. Найти книги по автору")
-        print("5. Отметить книгу как прочитанную")
-        print("6. Отметить книгу как непрочитанную")
-        print("7. Удалить книгу")
-        print("8. Показать прочитанные книги")
-        print("9. Показать непрочитанные книги")
-        print("10. Сортировать книги по году публикации")
-        print("0. Выйти")
+@app.route('/')
+def index():
+    books = library.list_books()
+    if books is None:  # Проверка на случай, если возвращается None
+        books = []
+    return render_template('index.html', books=books)
 
-        choice = input("Выберите действие: ")
+@app.route('/add', methods=['POST'])
+def add_book():
+    title = request.form.get('title')
+    author = request.form.get('author')
+    try:
+        year = int(request.form.get('year'))
+    except ValueError:
+        flash('Год должен быть числом')
+        return redirect(url_for('index'))
 
-        if choice == "1":
-            title = input("Введите название книги: ")
-            author = input("Введите автора книги: ")
-            year = int(input("Введите год публикации: "))
-            book = Book(title, author, year)
-            library.add_book(book)
+    book = Book(title, author, year)
+    library.add_book(book)
+    flash(f"Книга {title} добавлена в библиотеку")
+    return redirect(url_for('index'))
 
-        elif choice == "2":
-            print("\nСписок книг:")
-            library.list_books()
+@app.route('/remove/<title>')
+def remove_book(title):
+    if library.remove_book(title):
+        flash(f"Книга {title} была удалена из библиотеки")
+    else:
+        flash(f"Книга с названием {title} не найдена")
+    return redirect(url_for('index'))
 
-        elif choice == "3":
-            title = input("Введите название книги: ")
-            library.find_by_title(title)
+@app.route('/mark_read/<title>')
+def mark_read(title):
+    if library.mark_book_as_read(title):
+        flash(f"Книга {title} была отмечена как прочитанная")
+    else:
+        flash(f"Книга с названием {title} не найдена")
+    return redirect(url_for('index'))
 
-        elif choice == "4":
-            author = input("Введите автора книги: ")
-            library.find_by_author(author)
+@app.route('/mark_unread/<title>')
+def mark_unread(title):
+    if library.mark_book_as_unread(title):
+        flash(f"Книга {title} была отмечена как непрочитанная")
+    else:
+        flash(f"Книга с названием {title} не найдена")
+    return redirect(url_for('index'))
 
-        elif choice == "5":
-            title = input("Введите название книги: ")
-            library.mark_book_as_read(title)
+@app.route('/sort')
+def sort_books():
+    library.sort_books_by_year()
+    flash("Книги отсортированны по году публикации")
+    return redirect(url_for('index'))
 
-        elif choice == "6":
-            title = input("Введите название книги: ")
-            library.mark_book_as_unread(title)
-
-        elif choice == "7":
-            title = input("Введите название книги для удаления: ")
-            library.remove_book(title)
-
-        elif choice == "8":
-            print("\nПрочитанные книги:")
-            library.filter_books(read_status=True)
-
-        elif choice == "9":
-            print("\nНепрочитанные книги:")
-            library.filter_books(read_status=False)
-
-        elif choice == "10":
-            library.sort_books_by_year()
-            print("\nСписок книг после сортировки:")
-            library.list_books()
-
-        elif choice == "0":
-            print("Выход из программы.")
-            break
-
-        else:
-            print("Неверный ввод, попробуйте снова.")
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)

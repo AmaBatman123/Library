@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 6px 12px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .actions a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .actions a:hover {
+            color: #0056b3;
+        }
+        .flash-messages {
+            max-width: 600px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+        .sort-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            text-decoration: none;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .sort-link:hover {
+            color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Библиотека</h1>
+
+    <!-- Форма добавления новой книги -->
+    <form method="POST" action="/add">
+        <input type="text" name="title" placeholder="Название" required>
+        <input type="text" name="author" placeholder="Автор" required>
+        <input type="text" name="year" placeholder="Год" required>
+        <button type="submit">Добавить книгу</button>
+    </form>
+
+    <!-- Flash сообщения -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Список книг -->
+    <h2>Список книг</h2>
+    <ul>
+        {% for book in books %}
+            <li>
+                <span>{{ book.title }} by {{ book.author }} ({{ book.year }}) - {{ "Прочитана" if book.read else "Не прочитана" }}</span>
+                <span class="actions">
+                    <a href="/mark_read/{{ book.title }}">[Отметить как прочитанная]</a>
+                    <a href="/mark_unread/{{ book.title }}">[Отметить как непрочитанная]</a>
+                    <a href="/remove/{{ book.title }}">[Удалить]</a>
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Ссылка на сортировку книг -->
+    <a class="sort-link" href="/sort">Сортировать по году публикации</a>
+
+</body>
+</html>
